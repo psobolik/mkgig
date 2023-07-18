@@ -1,5 +1,4 @@
 using System.Collections;
-using NStack;
 using Terminal.Gui;
 
 namespace mkgig
@@ -14,10 +13,10 @@ namespace mkgig
         {
             public bool IsMarked { get; set; }
             public bool IsVisible { get; set; }
-            public string TemplateName { get; set; } = string.Empty;
+            public string TemplateName { get; init; } = string.Empty;
         }
 
-        private List<GitignoreTemplate> Templates { get; set; } = new();
+        private List<GitignoreTemplate> Templates { get; set; }
 
         public int Count => VisibleTemplates.Count();
 
@@ -41,51 +40,12 @@ namespace mkgig
                     TemplateName = templateName,
                 }).ToList();
         }
-        private void RenderUstr(ConsoleDriver driver, ustring ustr, int col, int line, int width, int start = 0)
-        {
-            int byteLen = ustr.Length;
-            int used = 0;
-            for (int i = start; i < byteLen;)
-            {
-                (var rune, var size) = Utf8.DecodeRune(ustr, i, i - byteLen);
-                used += Rune.ColumnWidth(rune);
-                if (used > width)
-                    break;
-                driver.AddRune(rune);
-                i += size;
-            }
-            for (; used < width; used++)
-            {
-                driver.AddRune(' ');
-            }
-        }
 
-        // private void RenderUstr(ConsoleDriver driver, ustring ustr, int col, int line, int width, int start = 0)
-        // {
-        //     int byteLen = ustr.Length;
-        //     int used = 0;
-        //     for (int i = start; i < byteLen;)
-        //     {
-        //         (var rune, var size) = Utf8.DecodeRune(ustr, i, i - byteLen);
-        //         var count = Rune.ColumnWidth(rune);
-        //         if (used + count > width)
-        //             break;
-        //         driver.AddRune(rune);
-        //         used += count;
-        //         i += size;
-        //     }
-        //     for (; used < width; used++)
-        //     {
-        //         driver.AddRune(' ');
-        //     }
-        // }
-
-        public void Render(ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width, int start = 0)
+        public void Render(ListView container, ConsoleDriver driver, bool selected, int item, int col, int line,
+            int width, int start = 0)
         {
             container.Move(col, line);
-            var t = VisibleTemplates.ToArray()[item];
-            ustring u = t == null ? ustring.Empty : t.TemplateName;
-            RenderUstr(driver, u, col, line, width, start);
+            driver.AddStr(VisibleTemplates.ToArray()[item].TemplateName.PadRight(width));
         }
 
         public void SetMark(int item, bool value)

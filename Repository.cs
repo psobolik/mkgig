@@ -1,12 +1,12 @@
-namespace GitignoreIo
+namespace mkgig
 {
     public static class Repository
     {
-        private static readonly string _apiUrl = "https://www.toptal.com/developers/gitignore/api/";
+        private const string ApiUrl = "https://www.toptal.com/developers/gitignore/api/";
 
         public static async Task<IEnumerable<string>> GetTemplateNames()
         {
-            var templateNames = await InvokeApi("list").ConfigureAwait(false);
+            var templateNames = await InvokeApi("list");
             return templateNames.Split('\n').SelectMany(line => line.Split(',')).ToList();
         }
 
@@ -18,7 +18,7 @@ namespace GitignoreIo
         private static async Task<string> InvokeApi(string method)
         {
             using var client = new HttpClient();
-            return await client.GetStringAsync($"{_apiUrl}{method}").ConfigureAwait(false);
+            return await client.GetStringAsync($"{ApiUrl}{method}").ConfigureAwait(false);
         }
     }
 }
